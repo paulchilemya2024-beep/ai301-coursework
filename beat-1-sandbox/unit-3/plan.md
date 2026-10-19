@@ -1,11 +1,27 @@
-Replace this file with your unit-3 plan: the same `plan.md` your
-plan-check run graded.
+# Plan: issue #72 — verify_password raises UnknownHashError on malformed stored hashes
 
-Keep the deviations heading below, and fill it before you submit. It is
-graded on being answered, not on there being deviations to report.
+## Diagnosis
+
+`verify_password` in `core/security.py` calls `pwd_context.verify()` directly. If the
+stored hash is not recognized, Passlib raises `UnknownHashError` instead of returning
+a boolean, contrary to the function's documented behavior.
+
+## Scope
+
+- Update `verify_password` to return `False` for `UnknownHashError`.
+- Remove the `xfail` marker from the malformed-hash regression test.
+- Leave password hashing, JWT code, and other callers unchanged.
+
+## Approach
+
+Catch only `passlib.exc.UnknownHashError` around the existing verify call. This
+handles unrecognized hashes without swallowing unrelated exceptions.
+
+## Test plan
+
+Run `tests/unit/test_security.py` to cover the malformed hash and existing valid,
+incorrect, and other security behavior.
 
 ## Deviations
 
-[What changed between the plan you posted and the change you built, and
-why. If nothing changed, say so in your own words - "nothing changed;
-the plan held" earns these points in full. Leaving this blank does not.]
+None; implementation and validation matched the plan.
