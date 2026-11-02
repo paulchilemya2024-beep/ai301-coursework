@@ -1,61 +1,41 @@
 # Unit 4 — Test and Submit
 
-Path: `beat-1-sandbox/unit-4/pull-request.md`
-
-Record of the pull request you opened against the Path Review repo, and of the evaluation
-runs that produced `eval-run.txt`. This file is graded at the path above; a copy kept
-anywhere else in the repository is not read.
-
-Complete every labelled field below. Each is graded on its own; content placed under the wrong
-label is not graded.
-
----
-
 ## Your pull request
 
 **Pull request**
 
-[Link to the pull request you opened. It must be the pull request's own page on the Path
-Review repo, not your fork's branch page.]
+https://github.com/codepath/pathreview-ai301-fa26-s3/pull/271
 
 **Branch**
 
-[The name of the branch the pull request comes from, exactly as it appears in your fork.
-The naming shape is a type prefix, then the issue number, then a short description. **The
-issue number in the branch name must be the number of the issue the pull request fixes** —
-a name carrying any other number does not satisfy this field.]
+`fix/72-malformed-password-hash`
 
 ## Eval iterations
 
-Answer all four sections. Quote source text directly; paraphrase does not satisfy these
-fields.
-
 **Run history**
 
-[The agreement score of each run you did, in order. A single run is a complete answer if
-only one run occurred. **The last score in your list must match the agreement line in the
-`eval-run.txt` you committed** — that file is the record of your final run.]
+1. Initial full evaluation with rubric v1: **13/20**. The `clear-accept` category floor was unmet at 0/7.
+2. Eleven-package diagnostic after the initial full run and before the first rubric revisions: **5/11**.
+3. Three-package diagnostic run (`pkg-05`, `pkg-08`, `pkg-11`): **0/3**.
+4. Thirteen-package canary after the first evidence-rule clarification: **10/13**. `pkg-13`, `pkg-16`, and `pkg-19` still disagreed; all were expected accepts rejected on “Change is actually tested.”
+5. A subsequent thirteen-package attempt hit Claude's individual spend limit; all items errored, so it produced no scored agreement result.
+6. Five-package canary (`pkg-13`, `pkg-16`, `pkg-19`, `pkg-01`, `pkg-04`): **5/5**.
+7. Final full evaluation: **20/20**. The committed `eval-run.txt` records `agreement: 20/20 scored items (bar: 18/20: PASS)` and every category matched.
+
+After that final evaluation, I added a live-mode-only carve-out for an honestly unchecked CI-green box on a pre-PR draft. It does not change eval-mode behavior or the saved 20/20 result. The uploaded rubric includes this refinement.
 
 **Package analysis**
 
-[Pick one scored package (`pkg-01` through `pkg-20` — the four `calib-` packages are never
-scored). Name it by id, say what your rubric decided and what the gold label said, and
-explain why your rubric read it that way.]
+`pkg-16` (gold: `accept`) was rejected by the intermediate rubric on “Change is actually tested.” The evidence showed a failing image-load repro returning an error and exit code 1, but the grader judged the formatted error inconsistent with the diff because the diff called the existing `exit.Error(...)` reporter, whose formatting was not shown in the diff. I revised the check to assess whether output from existing shared functions is behaviorally consistent with the change—such as the right error and exit code—instead of requiring every output character to be derivable from changed lines. The final evaluation accepted `pkg-16`, matching gold.
 
 **Check rationale**
 
-[Quote one check from the `rubric.md` you uploaded to `tools/pr-precheck/`, exactly as it reads now.
-Then say why it reads that way — what you revised to get there, or what you rejected in
-favour of it.]
+Exact quote from the uploaded `rubric.md`:
+
+> A secondary control case the plan's test plan also names (e.g. confirming an unrelated code path is unchanged) satisfies this check when reported as unchanged/passing, even without a full repeated transcript, PROVIDED the primary repro's before/after is fully shown -- do not fail this check merely because a control's identical-to-before result wasn't separately re-pasted.
+
+I added this criterion after the canary showed that requiring a full repeated transcript for every control rejected packages whose primary repro had complete before/after evidence and whose named controls were reported unchanged. It preserves the requirement for concrete primary repro evidence while avoiding a redundant-transcript requirement for secondary controls.
 
 **Trade-offs**
 
-[Every check gives something up. Any one of these is a complete answer: a package whose
-result it changes, a canary you re-ran with `--only`, a case you accept it will miss, or a
-stated reason nothing changed elsewhere. "Nothing changed, and here is how I know" earns
-the point in full when the reason follows.]
-
----
-
-Related paths: `eval-run.txt` in this directory; your skill's files in
-`tools/pr-precheck/`.
+The change from requiring pasted raw output to accepting concrete action-to-result observations risks accepting plausible but fabricated test reports; the grader sees package text rather than executing every package's code. I kept safeguards: the evidence must identify the primary repro and its before/after outcome, name the repository's test command or suite and its result, and remain behaviorally consistent with the diff. I reran canaries after revising the criterion: the 5-package canary scored 5/5, including the three previously missed accepts and two correctly rejected cases. The final full run scored 20/20, with all category floors met.
