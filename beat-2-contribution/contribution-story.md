@@ -55,7 +55,7 @@ happened; these entries are the toolkit's own timeline.
 All four entries are graded. Keep every heading below, and fill each
 one in the week it belongs to.
 
-**Unit 5: Built issue-scout with GitHub search and ranking tied to my fit profile.**
+**Unit 5: Built issue-scout, extending my Unit 1 issue-select rubric with automated GitHub search and ranking.**
 
 I built issue-scout by merging my existing rubric with a new search-strategy.md (four gh search issues queries tied to my fit profile -- Python/JS, web APIs, security tooling) and ranking filters that drop assigned issues, stale repos, and issue-farm-style repos with excessive generic labels. My first manual test queries returned mostly noise (beginner-practice repos, templated auto-generated issues), so I added an "api" keyword and an issue-farm label-count filter before trusting the strategy to a real scan. My first real scan caught a genuine rubric gap: it accepted an issue whose timeline referenced a commit saying "closes #103," even though my "Nobody already on it" check only looked at assignees and linked PRs -- I fixed the check to also flag closing-keyword commit references. When I used the scout to grade two issues I'd claimed on the Issue Selection site (both in Altinn/altinn-studio), it correctly rejected a third candidate for an already-open competing PR, and ranked my eventual pick as the stronger, more reproducible bug fix of the two it accepted.
 
